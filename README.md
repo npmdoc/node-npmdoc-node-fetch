@@ -1,11 +1,13 @@
-# api documentation for  [node-fetch (v1.6.3)](https://github.com/bitinn/node-fetch)  [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-node-fetch.svg)](https://travis-ci.org/npmdoc/node-npmdoc-node-fetch)
+# api documentation for  [node-fetch (v1.6.3)](https://github.com/bitinn/node-fetch)  [![npm package](https://img.shields.io/npm/v/npmdoc-node-fetch.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-node-fetch) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-node-fetch.svg)](https://travis-ci.org/npmdoc/node-npmdoc-node-fetch)
 #### A light-weight module that brings window.fetch to node.js and io.js
 
 [![NPM](https://nodei.co/npm/node-fetch.png?downloads=true)](https://www.npmjs.com/package/node-fetch)
 
-[![apidoc](https://npmdoc.github.io/node-npmdoc-node-fetch/build/screen-capture.buildNpmdoc.browser._2Fhome_2Ftravis_2Fbuild_2Fnpmdoc_2Fnode-npmdoc-node_fetch_2Ftmp_2Fbuild_2Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-node-fetch/build..beta..travis-ci.org/apidoc.html)
+[![apidoc](https://npmdoc.github.io/node-npmdoc-node-fetch/build/screenCapture.buildNpmdoc.browser.%2Fhome%2Ftravis%2Fbuild%2Fnpmdoc%2Fnode-npmdoc-node-fetch%2Ftmp%2Fbuild%2Fapidoc.html.png)](https://npmdoc.github.io/node-npmdoc-node-fetch/build/apidoc.html)
 
-![package-listing](https://npmdoc.github.io/node-npmdoc-node-fetch/build/screen-capture.npmPackageListing.svg)
+![npmPackageListing](https://npmdoc.github.io/node-npmdoc-node-fetch/build/screenCapture.npmPackageListing.svg)
+
+![npmPackageDependencyTree](https://npmdoc.github.io/node-npmdoc-node-fetch/build/screenCapture.npmPackageDependencyTree.svg)
 
 
 
