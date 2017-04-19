@@ -63,6 +63,15 @@
 
         <li>
 
+            <a class="apidocElementLiA" href="#apidoc.element.node-fetch.node-fetch">
+            function <span class="apidocSignatureSpan"></span>node-fetch
+            <span class="apidocSignatureSpan">(url, opts)</span>
+            </a>
+
+        </li>
+
+        <li>
+
             <a class="apidocElementLiA" href="#apidoc.element.node-fetch.Headers">
             function <span class="apidocSignatureSpan">node-fetch.</span>Headers
             <span class="apidocSignatureSpan">(headers)</span>
@@ -145,6 +154,12 @@
         <li>
 
             <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">node-fetch.</span>body.prototype</span>
+
+        </li>
+
+        <li>
+
+            <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">node-fetch.</span>default.prototype</span>
 
         </li>
 
@@ -371,6 +386,68 @@
 
     </ol></li>
 
+    <li class="apidocModuleLi"><a href="#apidoc.module.node-fetch.default">module node-fetch.default</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.node-fetch.default.default">
+            function <span class="apidocSignatureSpan">node-fetch.</span>default
+            <span class="apidocSignatureSpan">(url, opts)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.node-fetch.default.Headers">
+            function <span class="apidocSignatureSpan">node-fetch.default.</span>Headers
+            <span class="apidocSignatureSpan">(headers)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.node-fetch.default.Promise">
+            function <span class="apidocSignatureSpan">node-fetch.default.</span>Promise
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.node-fetch.default.Request">
+            function <span class="apidocSignatureSpan">node-fetch.default.</span>Request
+            <span class="apidocSignatureSpan">(input, init)</span>
+            </a>
+
+        </li>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.node-fetch.default.Response">
+            function <span class="apidocSignatureSpan">node-fetch.default.</span>Response
+            <span class="apidocSignatureSpan">(body, opts)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.node-fetch.default.prototype">module node-fetch.default.prototype</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.node-fetch.default.prototype.isRedirect">
+            function <span class="apidocSignatureSpan">node-fetch.default.prototype.</span>isRedirect
+            <span class="apidocSignatureSpan">(code)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
     <li class="apidocModuleLi"><a href="#apidoc.module.node-fetch.fetch_error">module node-fetch.fetch_error</a><ol>
 
         <li>
@@ -397,6 +474,142 @@
 
 <div class="apidocSectionDiv">
 <h1><a href="#apidoc.module.node-fetch" id="apidoc.module.node-fetch">module node-fetch</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.node-fetch.node-fetch" id="apidoc.element.node-fetch.node-fetch">
+        function <span class="apidocSignatureSpan"></span>node-fetch
+        <span class="apidocSignatureSpan">(url, opts)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function Fetch(url, opts) {
+
+	// allow call as function
+	if (!(this instanceof Fetch))
+		return new Fetch(url, opts);
+
+	// allow custom promise
+	if (!Fetch.Promise) {
+		throw new Error(&#x27;native promise missing, set Fetch.Promise to your favorite alternative&#x27;);
+	}
+
+	Body.Promise = Fetch.Promise;
+
+	var self = this;
+
+	// wrap http.request into fetch
+	return new Fetch.Promise(function(resolve, reject) {
+		// build request object
+		var options = new Request(url, opts);
+
+		if (!options.protocol || !options.hostname) {
+			throw new Error(&#x27;only absolute urls are supported&#x27;);
+		}
+
+		if (options.protocol !== &#x27;http:&#x27; &#x26;&#x26; options.protocol !== &#x27;https:&#x27;) {
+			throw new Error(&#x27;only http(s) protocols are supported&#x27;);
+		}
+
+		var send;
+		if (options.protocol === &#x27;https:&#x27;) {
+			send = https.request;
+		} else {
+			send = http.request;
+		}
+
+		// normalize headers
+		var headers = new Headers(options.headers);
+
+		if (options.compress) {
+			headers.set(&#x27;accept-encoding&#x27;, &#x27;gzip,deflate&#x27;);
+		}
+
+		if (!headers.has(&#x27;user-agent&#x27;)) {
+			headers.set(&#x27;user-agent&#x27;, &#x27;node-fetch/1.0 (+https://github.com/bitinn/node-fetch)&#x27;);
+		}
+
+		if (!headers.has(&#x27;connection&#x27;) &#x26;&#x26; !options.agent) {
+			headers.set(&#x27;connection&#x27;, &#x27;close&#x27;);
+		}
+
+		if (!headers.has(&#x27;accept&#x27;)) {
+			headers.set(&#x27;accept&#x27;, &#x27;*/*&#x27;);
+		}
+
+		// detect form data input from form-data module, this hack avoid the need to pass multipart header manually
+		if (!headers.has(&#x27;content-type&#x27;) &#x26;&#x26; options.body &#x26;&#x26; typeof options.body.getBoundary === &#x27;function&#x27;) {
+			headers.set(&#x27;content-type&#x27;, &#x27;multipart/form-data; boundary=&#x27; + options.body.getBoundary());
+		}
+
+		// bring node-fetch closer to browser behavior by setting content-length automatically
+		if (!headers.has(&#x27;content-length&#x27;) &#x26;&#x26; /post|put|patch|delete/i.test(options.method)) {
+			if (typeof options.body === &#x27;string&#x27;) {
+				headers.set(&#x27;content-length&#x27;, Buffer.byteLength(options.body));
+			// detect form data input from form-data module, this hack avoid the need to add content-length header manually
+			} else if (options.body &#x26;&#x26; typeof options.body.getLengthSync === &#x27;function&#x27;) {
+				// for form-data 1.x
+				if (options.body._lengthRetrievers &#x26;&#x26; options.body._lengthRetrievers.length == 0) {
+					headers.set(&#x27;content-length&#x27;, options.body.getLengthSync().toString());
+				// for form-data 2.x
+				} else if (options.body.hasKnownLength &#x26;&#x26; options.body.hasKnownLength()) {
+					headers.set(&#x27;content-length&#x27;, options.body.getLengthSync().toString());
+				}
+			// this is only necessary for older nodejs releases (before iojs merge)
+			} else if (options.body === undefined || options.body === null) {
+				headers.set(&#x27;content-length&#x27;, &#x27;0&#x27;);
+			}
+		}
+
+		options.headers = headers.raw();
+
+		// http.request only support string as host header, this hack make custom host header possible
+		if (options.headers.host) {
+			options.headers.host = options.headers.host[0];
+		}
+
+		// send request
+		var req = send(options);
+		var reqTimeout;
+
+		if (options.timeout) {
+			req.once(&#x27;socket&#x27;, function(socket) {
+				reqTimeout = setTimeout(function() {
+					req.abort();
+					reject(new FetchError(&#x27;network timeout at: &#x27; + options.url, &#x27;request-timeout&#x27;));
+				}, options.timeout);
+			});
+		}
+
+		req.on(&#x27;error&#x27;, function(err) {
+			clearTimeout(reqTimeout);
+			reject(new FetchError(&#x27;request to &#x27; + options.url + &#x27; failed, reason: &#x27; + err.message, &#x27;system&#x27;, err));
+		});
+
+		req.on(&#x27;response&#x27;, function(res) {
+			clearTimeout(reqTimeout);
+
+			// handle redirect
+			if (self.isRedirect(res.statusCode) &#x26;&#x26; options.redirect !== &#x27;manual&#x27;) {
+				if (options.redirect === &#x27;error&#x27;) {
+					reject(new FetchError(&#x27;redirect mode is set to error: &#x27; + options.url, &#x27;no-redirect&#x27;));
+					return;
+				}
+
+				if (options.counter &#x3e;= options.follow) {
+					reject(new FetchError(&#x27;maximum redirect reached at: &#x27; + options.url, &#x27;max-redirect&#x27;));
+					return;
+				}
+
+				if (!res.headers.location) {
+					reject(new FetchError(&#x27;redirect location header missing at: &#x27; + options.url, &#x27;invalid-redirect&#x27;));
+					return;
+				}
+
+				// per fetch spec, for POST request with 301/302 response, or any request with 303 response, use GET wh ...</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
 
 
     <h2>
@@ -734,6 +947,8 @@
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">n/a</pre></li>
     </ul>
+
+
 
 
 
@@ -1546,6 +1761,336 @@ spec.whatwg.org/) implementation details, document known difference.
 
 - See [Known Differences](https://github.com/bitinn/node-fetch/blob/master/LIMITS.md) for details.
 - If you happen to use a missing feature that `window.fetch` offers, feel free to open an issue.
+...</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.node-fetch.default" id="apidoc.module.node-fetch.default">module node-fetch.default</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.node-fetch.default.default" id="apidoc.element.node-fetch.default.default">
+        function <span class="apidocSignatureSpan">node-fetch.</span>default
+        <span class="apidocSignatureSpan">(url, opts)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function Fetch(url, opts) {
+
+	// allow call as function
+	if (!(this instanceof Fetch))
+		return new Fetch(url, opts);
+
+	// allow custom promise
+	if (!Fetch.Promise) {
+		throw new Error(&#x27;native promise missing, set Fetch.Promise to your favorite alternative&#x27;);
+	}
+
+	Body.Promise = Fetch.Promise;
+
+	var self = this;
+
+	// wrap http.request into fetch
+	return new Fetch.Promise(function(resolve, reject) {
+		// build request object
+		var options = new Request(url, opts);
+
+		if (!options.protocol || !options.hostname) {
+			throw new Error(&#x27;only absolute urls are supported&#x27;);
+		}
+
+		if (options.protocol !== &#x27;http:&#x27; &#x26;&#x26; options.protocol !== &#x27;https:&#x27;) {
+			throw new Error(&#x27;only http(s) protocols are supported&#x27;);
+		}
+
+		var send;
+		if (options.protocol === &#x27;https:&#x27;) {
+			send = https.request;
+		} else {
+			send = http.request;
+		}
+
+		// normalize headers
+		var headers = new Headers(options.headers);
+
+		if (options.compress) {
+			headers.set(&#x27;accept-encoding&#x27;, &#x27;gzip,deflate&#x27;);
+		}
+
+		if (!headers.has(&#x27;user-agent&#x27;)) {
+			headers.set(&#x27;user-agent&#x27;, &#x27;node-fetch/1.0 (+https://github.com/bitinn/node-fetch)&#x27;);
+		}
+
+		if (!headers.has(&#x27;connection&#x27;) &#x26;&#x26; !options.agent) {
+			headers.set(&#x27;connection&#x27;, &#x27;close&#x27;);
+		}
+
+		if (!headers.has(&#x27;accept&#x27;)) {
+			headers.set(&#x27;accept&#x27;, &#x27;*/*&#x27;);
+		}
+
+		// detect form data input from form-data module, this hack avoid the need to pass multipart header manually
+		if (!headers.has(&#x27;content-type&#x27;) &#x26;&#x26; options.body &#x26;&#x26; typeof options.body.getBoundary === &#x27;function&#x27;) {
+			headers.set(&#x27;content-type&#x27;, &#x27;multipart/form-data; boundary=&#x27; + options.body.getBoundary());
+		}
+
+		// bring node-fetch closer to browser behavior by setting content-length automatically
+		if (!headers.has(&#x27;content-length&#x27;) &#x26;&#x26; /post|put|patch|delete/i.test(options.method)) {
+			if (typeof options.body === &#x27;string&#x27;) {
+				headers.set(&#x27;content-length&#x27;, Buffer.byteLength(options.body));
+			// detect form data input from form-data module, this hack avoid the need to add content-length header manually
+			} else if (options.body &#x26;&#x26; typeof options.body.getLengthSync === &#x27;function&#x27;) {
+				// for form-data 1.x
+				if (options.body._lengthRetrievers &#x26;&#x26; options.body._lengthRetrievers.length == 0) {
+					headers.set(&#x27;content-length&#x27;, options.body.getLengthSync().toString());
+				// for form-data 2.x
+				} else if (options.body.hasKnownLength &#x26;&#x26; options.body.hasKnownLength()) {
+					headers.set(&#x27;content-length&#x27;, options.body.getLengthSync().toString());
+				}
+			// this is only necessary for older nodejs releases (before iojs merge)
+			} else if (options.body === undefined || options.body === null) {
+				headers.set(&#x27;content-length&#x27;, &#x27;0&#x27;);
+			}
+		}
+
+		options.headers = headers.raw();
+
+		// http.request only support string as host header, this hack make custom host header possible
+		if (options.headers.host) {
+			options.headers.host = options.headers.host[0];
+		}
+
+		// send request
+		var req = send(options);
+		var reqTimeout;
+
+		if (options.timeout) {
+			req.once(&#x27;socket&#x27;, function(socket) {
+				reqTimeout = setTimeout(function() {
+					req.abort();
+					reject(new FetchError(&#x27;network timeout at: &#x27; + options.url, &#x27;request-timeout&#x27;));
+				}, options.timeout);
+			});
+		}
+
+		req.on(&#x27;error&#x27;, function(err) {
+			clearTimeout(reqTimeout);
+			reject(new FetchError(&#x27;request to &#x27; + options.url + &#x27; failed, reason: &#x27; + err.message, &#x27;system&#x27;, err));
+		});
+
+		req.on(&#x27;response&#x27;, function(res) {
+			clearTimeout(reqTimeout);
+
+			// handle redirect
+			if (self.isRedirect(res.statusCode) &#x26;&#x26; options.redirect !== &#x27;manual&#x27;) {
+				if (options.redirect === &#x27;error&#x27;) {
+					reject(new FetchError(&#x27;redirect mode is set to error: &#x27; + options.url, &#x27;no-redirect&#x27;));
+					return;
+				}
+
+				if (options.counter &#x3e;= options.follow) {
+					reject(new FetchError(&#x27;maximum redirect reached at: &#x27; + options.url, &#x27;max-redirect&#x27;));
+					return;
+				}
+
+				if (!res.headers.location) {
+					reject(new FetchError(&#x27;redirect location header missing at: &#x27; + options.url, &#x27;invalid-redirect&#x27;));
+					return;
+				}
+
+				// per fetch spec, for POST request with 301/302 response, or any request with 303 response, use GET wh ...</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.node-fetch.default.Headers" id="apidoc.element.node-fetch.default.Headers">
+        function <span class="apidocSignatureSpan">node-fetch.default.</span>Headers
+        <span class="apidocSignatureSpan">(headers)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function Headers(headers) {
+
+	var self = this;
+	this._headers = {};
+
+	// Headers
+	if (headers instanceof Headers) {
+		headers = headers.raw();
+	}
+
+	// plain object
+	for (var prop in headers) {
+		if (!headers.hasOwnProperty(prop)) {
+			continue;
+		}
+
+		if (typeof headers[prop] === &#x27;string&#x27;) {
+			this.set(prop, headers[prop]);
+
+		} else if (typeof headers[prop] === &#x27;number&#x27; &#x26;&#x26; !isNaN(headers[prop])) {
+			this.set(prop, headers[prop].toString());
+
+		} else if (headers[prop] instanceof Array) {
+			headers[prop].forEach(function(item) {
+				self.append(prop, item.toString());
+			});
+		}
+	}
+
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.node-fetch.default.Promise" id="apidoc.element.node-fetch.default.Promise">
+        function <span class="apidocSignatureSpan">node-fetch.default.</span>Promise
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function Promise() { [native code] }</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+	}
+
+	Body.Promise = Fetch.Promise;
+
+	var self = this;
+
+	// wrap http.request into fetch
+	return new Fetch.<span class="apidocCodeKeywordSpan">Promise</span>(function(resolve, reject) {
+		// build request object
+		var options = new Request(url, opts);
+
+		if (!options.protocol || !options.hostname) {
+			throw new Error(&#x27;only absolute urls are supported&#x27;);
+		}
+...</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.node-fetch.default.Request" id="apidoc.element.node-fetch.default.Request">
+        function <span class="apidocSignatureSpan">node-fetch.default.</span>Request
+        <span class="apidocSignatureSpan">(input, init)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function Request(input, init) {
+	var url, url_parsed;
+
+	// normalize input
+	if (!(input instanceof Request)) {
+		url = input;
+		url_parsed = parse_url(url);
+		input = {};
+	} else {
+		url = input.url;
+		url_parsed = parse_url(url);
+	}
+
+	// normalize init
+	init = init || {};
+
+	// fetch spec options
+	this.method = init.method || input.method || &#x27;GET&#x27;;
+	this.redirect = init.redirect || input.redirect || &#x27;follow&#x27;;
+	this.headers = new Headers(init.headers || input.headers || {});
+	this.url = url;
+
+	// server only options
+	this.follow = init.follow !== undefined ?
+		init.follow : input.follow !== undefined ?
+		input.follow : 20;
+	this.compress = init.compress !== undefined ?
+		init.compress : input.compress !== undefined ?
+		input.compress : true;
+	this.counter = init.counter || input.counter || 0;
+	this.agent = init.agent || input.agent;
+
+	Body.call(this, init.body || this._clone(input), {
+		timeout: init.timeout || input.timeout || 0,
+		size: init.size || input.size || 0
+	});
+
+	// server request options
+	this.protocol = url_parsed.protocol;
+	this.hostname = url_parsed.hostname;
+	this.port = url_parsed.port;
+	this.path = url_parsed.path;
+	this.auth = url_parsed.auth;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+
+    <h2>
+        <a href="#apidoc.element.node-fetch.default.Response" id="apidoc.element.node-fetch.default.Response">
+        function <span class="apidocSignatureSpan">node-fetch.default.</span>Response
+        <span class="apidocSignatureSpan">(body, opts)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">function Response(body, opts) {
+
+	opts = opts || {};
+
+	this.url = opts.url;
+	this.status = opts.status || 200;
+	this.statusText = opts.statusText || http.STATUS_CODES[this.status];
+	this.headers = new Headers(opts.headers);
+	this.ok = this.status &#x3e;= 200 &#x26;&#x26; this.status &#x3c; 300;
+
+	Body.call(this, body, opts);
+
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.node-fetch.default.prototype" id="apidoc.module.node-fetch.default.prototype">module node-fetch.default.prototype</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.node-fetch.default.prototype.isRedirect" id="apidoc.element.node-fetch.default.prototype.isRedirect">
+        function <span class="apidocSignatureSpan">node-fetch.default.prototype.</span>isRedirect
+        <span class="apidocSignatureSpan">(code)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">isRedirect = function (code) {
+	return code === 301 || code === 302 || code === 303 || code === 307 || code === 308;
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+			reject(new FetchError(&#x27;request to &#x27; + options.url + &#x27; failed, reason: &#x27; + err.message, &#x27;system&#x27;,
+err));
+		});
+
+		req.on(&#x27;response&#x27;, function(res) {
+			clearTimeout(reqTimeout);
+
+			// handle redirect
+			if (self.<span class="apidocCodeKeywordSpan">isRedirect</span>(res.statusCode) &#x26;&#x26; options.redirect !== &#x27;manual
+&#x27;) {
+				if (options.redirect === &#x27;error&#x27;) {
+					reject(new FetchError(&#x27;redirect mode is set to error: &#x27; + options.url, &#x27;no-redirect&#x27;));
+					return;
+				}
+
+				if (options.counter &#x3e;= options.follow) {
+					reject(new FetchError(&#x27;maximum redirect reached at: &#x27; + options.url, &#x27;max-redirect&#x27;));
 ...</pre></li>
     </ul>
 
